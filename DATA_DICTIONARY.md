@@ -1,6 +1,6 @@
 # Data Dictionary
 
-See the `README.md` file for the project descritpion and content in which the dataset is used.
+See the `README.md` file for the project descriptions and content in which the dataset is used. For a detailed list of features used, check the `feature_dictionary.csv` file.
 
 ## 1. Dataset Provenance
 
@@ -14,7 +14,7 @@ See the `README.md` file for the project descritpion and content in which the da
 - Kuzilek, Hlosta, Zdrahal (2017), *Open University Learning Analytics dataset* (Scientific Data)
 
 **License:**
-- CC BY 4.0 (Attribution 4.0 International). You must provide attribution when redistributing derived materials.
+- CC BY 4.0 (Attribution 4.0 International)
 
 ## 2. Repository Data Locations
 

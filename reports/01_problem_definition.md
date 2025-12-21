@@ -1,6 +1,6 @@
-# Deliverable 1 — Problem Definition (OULAD Early-Warning Classifier)
+# Deliverable 1:<br>**Problem Definition**
 
-## 1. Background and motivation
+## 1. Background
 
 Online and blended courses often have limited capacity for proactive support for learners who are struggling with the learning experience in the course. By the time a learner(student) has clearly disengaged, withdrew from the course, or fails a major assessment, it may be too late to intervene effectively. This project proposes an **early-warning classification model** that uses *early-course signals* (engagement + assessment behavior) to predict end-of-course risk tiers at **Week 8** which is a typical mid point for higher-education course offerings globally (about 50% of a semester).
 
@@ -14,7 +14,7 @@ The model is designed to support *early supportive interventions*, such as:
 - Resource recommendations
 - Escalation to advisors for high-risk cases
 
-> **Important Note:** <br>Predictions are framed for support, not punishment. The model is decision-support only and must be paired with human review and appropriate student services.
+> **Important Note:** <br>Predictions are framed for support, not evaluation or penalization. The model is decision-support only and must be paired with human review and appropriate student services.
 
 ## 2. Classification Problem Statement
 
@@ -60,140 +60,57 @@ The solution uses the following OULAD CSVs (stored locally in `inputs/raw/`):
 
 Please see the Data Dictionary file (`DATA_DICTIONARY.md` in the repository root) and the 
 
-### 5.2 Feature window (leakage-safe)
-All engineered “behavior” and “performance” features must satisfy:
+### 5.2. Range
 
-- **VLE features:** only events where `date <= 56`
-- **Assessment features:** only assessments scheduled with `assessments.date <= 56` and any related submission/score data available up to that point
+All relevant features must satisfy:
 
-Examples of Week-8 feature families:
-- total clicks, active days, mean/std daily clicks (consistency & stability)
-- clicks by activity type (interpretability)
-- number of assessments submitted by Day 56
-- average score (where available) and weighted score summaries
-- submission timing summaries (e.g., latest submission day ≤ 56)
+- **VLE features:** only events where the date is before the cutoff (number of days)
+- **Assessment features:** only assessments scheduled where the date is before the cutoff (number of days) and any related submission data available up to that point
+- To preserve a realistic early-warning setup, enrolment that unregistered before the cutoff are excluded, because the “non-completion pathway” has already occurred by prediction time.
 
-### 5.3 Excluding “event already happened” cases
-To preserve a realistic early-warning setup, enrolments that **unregistered on or before Day 56** are excluded, because the “non-completion pathway” has already occurred by prediction time.
+## 6. Data Handling
 
-> **Guarantee (no label leakage):** No features will be computed using events after Day 56, and enrolments already ended by Day 56 are removed.
+### 6.1. Class Imbalance
+It is likley that some outcomes are less frequent than others. This should be identifed and addressed.
 
----
-
-## 6) Expected data challenges and planned handling
-
-### 6.1 Class imbalance (likely)
-`Withdrawn` is typically less frequent than `Pass/Distinction`, so we expect **class imbalance** (minority High Risk). This affects metric choice and may affect model training.
-
-**Planned response:**
-- prioritize **macro-averaged** evaluation (macro-F1) so minority classes matter
-- report **balanced accuracy** and per-class metrics
-- consider class-weighted models (e.g., `class_weight="balanced"`) as a default baseline
-- optional: apply resampling only **inside CV folds** (never before splitting)
-
-> **Guarantee (imbalance-aware evaluation):** We will not rely on accuracy alone; minority-class performance is explicitly measured and reported.
-
-### 6.2 Missing values
-Some engineered features may be missing (e.g., students with no early submissions). Missingness will be handled via a reproducible preprocessing pipeline:
+### 6.2. Missing values
+Some features may be missing. Missing values will be handled via a reproducible preprocessing pipeline:
 - numeric imputation (median)
 - categorical imputation (most frequent)
 
-### 6.3 High-dimensional categorical features
+### 6.3. Use of Categorical features
 Categorical variables (region, education, IMD band, etc.) require encoding:
 - one-hot encoding (`handle_unknown="ignore"`) inside a pipeline
 
-### 6.4 Potential proxies and fairness risks
-Some variables may act as proxies for socioeconomic or demographic factors. This requires careful use and auditing (see Ethics section).
+## 7. Success Criteria
 
----
+### 7.1 Primary
+- **Macro-F1** since it treats all classes equally and can be a good fit when there is a class imbalance.
 
-## 7) Model objective and success criteria (how we judge “good”)
-
-### 7.1 Primary metric
-- **Macro-F1** (primary): treats all classes equally, appropriate under imbalance
-
-### 7.2 Secondary metrics
-- **Balanced accuracy**
+### 7.2 Secondary
 - **Per-class precision/recall/F1**, with emphasis on **High Risk (Withdrawn)** recall
 - **Precision–Recall analysis (High Risk vs rest)** to support operational threshold decisions
 
-### 7.3 Baseline requirement
-- Compare against a **majority-class baseline** (DummyClassifier most_frequent) to ensure the model adds value.
-
-**Success criteria (practical):**
-- tuned models should meaningfully outperform the baseline on **macro-F1**
-- demonstrate usable trade-offs for High Risk identification (PR curve) aligned with support capacity
-
----
-
-## 8) Validation plan and experimental design (to avoid over-claiming)
+## 8. Validation Plan
 
 - Use a **train/test split** with stratification to preserve class proportions
-- Prefer **group-aware splitting by `id_student`** (so the same student does not appear in both train and test)
 - Use **cross-validation on training only** for model selection and tuning
 - Use the **test set once** for final reporting after selection
 
-> **Guarantee (honest evaluation):** The test set is reserved for the final evaluation only.
+## 9. Approach
 
----
+Train and compare at least two model families:
 
-## 9) Proposed modeling approach (high-level)
+1. **Logistic Regression** <br>
+   Since it is interpretable baseline and supports class weights for imbalance
 
-We will train and compare at least two model families:
+2. **Random Forest**
+   Since it should be able to handle mixed feature types after encoding.
 
-1) **Logistic Regression (multinomial)**  
-   - interpretable baseline  
-   - supports class weights for imbalance
+Hyperparameter tuning will be applied.
 
-2) **Random Forest** (or other tree ensemble, if included)  
-   - captures nonlinear patterns and feature interactions  
-   - can handle mixed feature types after encoding
+## 10. Ethical Considerations
 
-Hyperparameter tuning will be applied to **two models** using structured search (Grid/Randomized), and model selection will prioritize macro-F1 plus High Risk behavior.
-
----
-
-## 10) Ethical considerations and mitigation plan
-
-### 10.1 Risks
-- **False negatives (High Risk predicted as Low/Medium):** students needing support may be missed  
-- **False positives (Low/Medium predicted as High):** unnecessary outreach could burden staff and potentially stigmatize students  
-- **Bias/fairness:** demographic/proxy variables could drive differential error rates across subgroups  
-- **Misuse risk:** predictions could be used punitively rather than supportively
-
-### 10.2 Mitigations
-- Use the model for **support triage**, not punitive action
-- Report per-class metrics and analyze High Risk PR trade-offs to set thresholds responsibly
-- Conduct subgroup checks where possible (performance by demographic slices) and document limitations
-- Consider excluding the most sensitive attributes from modeling if they dominate importance without clear justification
-- Provide transparent interpretation artifacts (feature importances/coefficients)
-
-> **Guarantee (responsible use):** The output is framed as *decision-support* with documented limitations and recommended safeguards.
-
----
-
-## 11) Scope and non-goals
-
-**In scope:**
-- Week-8 early-warning prediction at the enrolment level
-- 3-class risk tiering based on `final_result`
-- leakage-safe feature engineering (≤ Day 56)
-- model training, tuning, and evaluation with appropriate metrics
-
-**Out of scope (for this capstone iteration):**
-- real-time deployment, UI integration, or live intervention workflows
-- causal claims (we do not claim features *cause* outcomes)
-- personalized intervention recommendations (beyond risk triage)
-
----
-
-## 12) How this deliverable connects to the rest of the solution
-
-- **Deliverable 2 (Jupyter Notebooks):**
-  - **Notebook 1:** data ingestion, leakage-safe Week-8 feature engineering, EDA (≥6 visuals + interpretation), preprocessing pipeline, train/test split artifacts
-  - **Notebook 2:** baseline + 2 model families, CV evaluation, tuning for 2 models, final test evaluation, confusion matrix + PR/ROC + model interpretation artifacts
-
-- **Deliverable 3 (Performance Report):**
-  - non-technical summary referencing Notebook outputs (saved figures/tables), including ethical reflections and operational trade-offs
-
----
+- **False negatives (High Risk predicted as Low/Medium):** will lead to students needing support may be missed.
+- **False positives (Low/Medium predicted as High):** will lead to unnecessary outreach and trust erosion (in the solution and organization).  
+- **Bias:** demographic/proxy variables could drive differential error rates across subgroups. 
