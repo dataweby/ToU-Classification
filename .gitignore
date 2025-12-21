@@ -1,7 +1,6 @@
 # Data
 inputs/raw/*
 !inputs/raw/.gitkeep
-inputs/external/
 
 # OS
 .DS_Store
