@@ -20,11 +20,11 @@ The model is designed to support *early supportive interventions*, such as:
 
 ### 2.1. Framing (UNIT / EVENT / HORIZON / PREDICTION TIME)
 
-Predict whether a **student in a given course** will fall into **Low / Medium / High risk** of course outcome **by end of course**, using data recorded up to **Week 8 (Day 56)**, so that course staff can **prioritize early supportive interventions** for learners most likely to need help.
+Predict whether a **student in a given course** will fall into **Low / Medium / High risk** of course outcome **by end of course**, using data recorded up to **a cutoff date (Day 98)**, so that course staff can **prioritize early supportive interventions** for learners most likely to need help.
 
 ### 2.2. The "Risk" Definition
 
-This project defines risk as the **risk of not successfully completing the course**. We operationalize this as a **3-class label** derived from `final_result`:
+This project defines risk as the **risk of not successfully completing the course**, to create a system of risk tiers. We operationalize this as a **3-class label** derived from `final_result`:
 
 1. **Low risk:** `Pass` or `Distinction` (which would be no risk) 
 2. **Medium risk:** `Fail`  
@@ -34,7 +34,7 @@ This mapping creates a **risk severity ladder** where `Withdrawn` represents the
 
 ## 3. Hypothesis
 
-Early-course behavioral and performance signals available by a given day of the course (the models will use day 56), especially VLE engagement patterns and assessment performance, should contain enough signals to predict the 3-class risk tier better than a majority-class baseline.
+Early-course behavioral and performance signals available by a given day of the course (the models will use day 98 since it's 14 weeks and less than half the duration for all courses in the dataset), especially VLE engagement patterns and assessment performance, should contain enough signals to predict the 3-class risk tier better than a majority-class baseline.
 
 ## 4. Dataset Used
 
@@ -77,6 +77,8 @@ It is likley that some outcomes are less frequent than others. This should be id
 Some features may be missing. Missing values will be handled via a reproducible preprocessing pipeline:
 - numeric imputation (median)
 - categorical imputation (most frequent)
+
+An initial exploration revealed over 80% of the records in the virtual learning environment are missing values for the *week_from* and *week_from* columns.
 
 ### 6.3. Use of Categorical features
 Categorical variables (region, education, IMD band, etc.) require encoding:
