@@ -24,13 +24,17 @@ Predict whether a **student in a given course** will fall into **Low / Medium / 
 
 ### 2.2. The "Risk" Definition
 
-This project defines risk as the **risk of not successfully completing the course**, to create a system of risk tiers. We operationalize this as a **3-class label** derived from `final_result`:
+This project defines risk as the **risk of not successfully completing the course**, to create a system of risk tiers. The risk will be mapped as a **3-class label** derived from `final_result` creating three tiers:
 
 1. **Low risk:** `Pass` or `Distinction` (which would be no risk) 
 2. **Medium risk:** `Fail`  
 3.  **High risk:** `Withdrawn`
 
 This mapping creates a **risk severity ladder** where `Withdrawn` represents the highest risk outcome in terms of course non-completion.
+
+### 2.3. Concerns
+
+The "Withdrawn" outcome for a student may be less predictable than assumed since there are many possible reasons for that that go beyond performance or the basic demographics that are captured in the dataset.
 
 ## 3. Hypothesis
 
