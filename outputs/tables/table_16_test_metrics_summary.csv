@@ -1,0 +1,2 @@
+model,macro_f1,balanced_acc,precision_macro,recall_macro
+rf_tuned_best,0.565129461580142,0.5691854459319606,0.570089692755221,0.5691854459319606

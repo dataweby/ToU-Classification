@@ -1,0 +1,5 @@
+{
+  "best_name": "rf_tuned_best",
+  "CUTOFF_DAY": 98,
+  "train_cv_best_macro_f1": 0.5617453649105825
+}
