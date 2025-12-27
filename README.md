@@ -1,4 +1,8 @@
 
+## Machine
+
+Used GitHub Codespaces with a 4-Core, 16GM RAM, 32GB Storage Space
+
 ## Deliverables
 
  - **Deliverable 1: Problem Definition** <br>Available as a markdown file report in `reports/01_problem_definition.md`.
