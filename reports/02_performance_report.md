@@ -68,7 +68,7 @@ The dataset is built by joining multiple datasets from the [Open University Lear
 
 - **Table 5** (`table_5_missingness_summary.csv`) lists missing values in the used tables in the raw data.
 
-### 2.2 Course Timelines and the Selection of a Cutoff Day (the Definition of "Early")
+### 2.2. Course Timelines and the Selection of a Cutoff Day (the Definition of "Early")
 
 Figure 1 below confirms that course timelines are long enough that a 14-week (day 98 of a course) cutoff day can function as a realistic mid‑course intervention point (an “early warning” moment rather than end‑of‑course hindsight).
 
@@ -174,7 +174,7 @@ A pattern of engagement per tier is also visible based on the box plots of the c
 
 The Low Risk is notably higher compared to the other two tiers. This implies that students who are at a Low Risk level are engaging more with the VLE (clicking more).
 
-### 4.5 Assessment Performance (Mapped to Risk)
+### 4.5. Assessment Performance (Mapped to Risk)
 
 The distribution of average scores within the cutoff period is similar in nature to what is expected in online courses (and courses in general) which is more balanced.
 
@@ -247,7 +247,7 @@ The **Random Forest** model is the superior choice in this comparison as it prov
 
 - Table 12 (`table_12_model_comparison_cv_train_only.csv`) shows the comparison between the models when running with default configurations.
 
-### 5.2. Tuning Models
+### 5.3. Tuning Models
 
 Hyperparameter tuning was then performed on both models. 
 
@@ -263,7 +263,7 @@ Changing the way the algorithm constructs the decisions trees by searching for t
 
 - Table 14 (`table_14_rf_randomsearch_cv_results.csv`) shows the top configurations for the Random Forest model.
 
-### 5.3. Selecting the Best Model
+### 5.4. Selecting the Best Model
 
 Table 15 (`table_15_baseline_vs_models_train_cv_summary.csv`) shows the best performance for each of the models applied in the solution (baseline, random forest default, random forest tuned, logistic regression default, and logistic regression tuned).<br>
 
@@ -316,7 +316,7 @@ The macro averages reflect balanced performance across tiers (important under im
 
 Based on precision and F1 score, the model performs well for "Low Risk" predictions, poorly on "Medium Risk", and very bad on "High Risk" (which is what matters most). Additional investigation is required to better understand the outcomes.
 
-### 6.3 Confusion Matrix 
+### 6.3. Confusion Matrix 
 
 The confusion matrix shows which risk tiers are being confused, especially whether "High Risk" is being misclassified as "Medium and Low Risks".
 
@@ -352,16 +352,24 @@ Based on the table, the model most often confuses Medium Risk with Low Risk and 
 
 These results suggest that the predictability of the "High Risk" as a factor of withdrawals based on the dataset is difficult (or at the very least not simple).
 
-### 6.5 High Risk Focus
+### 6.5. High Risk Focus
 
 Because High Risk is the priority intervention group, we also examine “High Risk vs Rest” which refers to exploring the Low and Medium risk combined as a group.
 
 #### ROC Curve
 
+This ROC curve in figure 19 represents the “High Risk vs. everyone else” on the test set, and it shows the model has some ability to separate High Risk learners from non-High Risk learners, but it is not strong.
+
 ![ROC curve (High Risk vs rest](../outputs/figures/visual_16_roc_high_risk_vs_rest.png)
 *Figure 19: ROC curve (High Risk vs rest)*
 
-The orange diagonal is what random guessing would look like. The blue curve sits above the diagonal, so the model does have signal for separating High Risk from not-High Risk.
+Insights:
+
+- The curve sits above the diagonal “random guessing” line, which means the model ranks High Risk cases higher than non-High Risk cases more often than chance.
+
+- The AUC = 0.659 means that, if you randomly pick one High Risk learner and one non-High Risk learner, the model will assign a higher risk score to the High Risk learner about 66% of the time. That’s better than a coin flip, but far from excellent.
+
+#### PR Curve
 
 ![Precision–Recall curve (High Risk vs rest)](../outputs/figures/visual_17_pr_high_risk_vs_rest.png)
 *Figure 17: Precision–Recall curve (High Risk vs rest)*
@@ -379,7 +387,7 @@ The AUC values:
 
 ---
 
-## 7. Feature Importance (interpretability)
+## 7. Feature Importance (Interpretability)
 
 The top features by importance for the model are:
 
